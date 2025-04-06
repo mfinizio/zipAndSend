@@ -24,6 +24,11 @@
 
         <button id="zipBtn" onclick="createZip()" style="display: none;">Crea Archivio ZIP</button>
 
+        <div id="progressContainer" style="display: none;">
+            <label for="progressBar">Creazione archivio ZIP...</label>
+            <progress id="progressBar" value="0" max="100" style="width: 100%;"></progress>
+        </div>        
+
         <!-- Link per il download del file ZIP -->
         <div id="downloadLinkContainer" style="display: none;">
             <a id="downloadLink" href="" download="referti.zip">Scarica il file ZIP</a>
@@ -61,11 +66,23 @@
             }
 
             const zip = new JSZip();
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+
+            // Mostra la progress bar
+            progressContainer.style.display = 'block';
+            progressBar.value = 0;
+
             selectedFiles.forEach(file => {
                 const relativePath = file.webkitRelativePath || file.name;
                 zip.file(relativePath, file);
             });
-            zip.generateAsync({ type: "blob" }).then(function(content) {
+            zip.generateAsync({ type: "blob", compression: "DEFLATE" }).then(function(progress) {
+                if (typeof progress.percent === 'number' && !isNaN(progress.percent)) {
+                    // Aggiorna la progress bar solo se il valore è valido
+                    progressBar.value = progress.percent;
+                }
+            }).then(function(content) {
                 const zipFile = new Blob([content], { type: 'application/zip' });
                 const zipUrl = URL.createObjectURL(zipFile);
 
@@ -73,6 +90,10 @@
                 const downloadLink = document.getElementById('downloadLink');
                 downloadLink.href = zipUrl;
                 document.getElementById('downloadLinkContainer').style.display = 'block';
+
+                // Nascondi la progress bar e mostra il pulsante per inviare su Telegram
+                progressContainer.style.display = 'none';
+
                 document.getElementById('sendBtn').style.display = 'inline-block';
             });
         }
