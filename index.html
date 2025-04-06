@@ -22,6 +22,7 @@
         <button onclick="document.getElementById('fileInput').click()">Seleziona i file</button>
 
         <div class="file-list" id="fileList"></div>
+        <button id="toggleFileListBtn" style="display:none; margin-top: 5px;" onclick="toggleFileList()">Mostra tutti</button>
 
         <button id="zipBtn" onclick="createZip()" style="display: none;">Crea Archivio ZIP</button>
 
@@ -40,25 +41,62 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
     <script>
         let selectedFiles = [];
+        let showAllFiles = false;
 
         document.getElementById('fileInput').addEventListener('change', function(event) {
             selectedFiles = Array.from(event.target.files);
+            showAllFiles = false;
+
+            updateFileList();
+
+            // Mostra il pulsante "Crea Archivio ZIP" solo se ci sono file
+            document.getElementById('zipBtn').style.display = selectedFiles.length > 0 ? 'inline-block' : 'block';
+        });
+
+        function updateFileList() {
+            console.log('[START] updateFileList()');
+            const startTime = performance.now();
+
             const fileListDiv = document.getElementById('fileList');
+            const toggleBtn = document.getElementById('toggleFileListBtn');
             fileListDiv.innerHTML = '';
-            selectedFiles.forEach(file => {
-                // Mostra i file selezionati (inclusi quelli nelle cartelle)
+
+            const filesToShow = showAllFiles ? selectedFiles : selectedFiles.slice(0, 5);
+
+            filesToShow.forEach(file => {
                 const fileItem = document.createElement('p');
-                fileItem.textContent = file.webkitRelativePath || file.name;
+                fileItem.textContent = file.name;
                 fileListDiv.appendChild(fileItem);
             });
 
-            // Mostra il pulsante "Crea Archivio ZIP" solo se ci sono file
-            if (selectedFiles.length > 0) {
-                document.querySelector('button[onclick="createZip()"]').style.display = 'block';
+            // Mostra il pulsante "Mostra tutti" solo se ci sono più di 5 file
+            if (selectedFiles.length > 5) {
+                toggleBtn.style.display = 'inline-block';
+                toggleBtn.textContent = showAllFiles ? 'Comprimi elenco' : 'Mostra tutti';
+            } else {
+                toggleBtn.style.display = 'none';
             }
-        });
+
+            const endTime = performance.now();
+            const durationMs = endTime - startTime;
+
+            // Conversione in minuti e secondi
+            const minutes = Math.floor(durationMs / 60000);
+            const seconds = ((durationMs % 60000) / 1000).toFixed(2);
+
+            console.log('[END] updateFileList()');
+            console.log(`Tempo impiegato: ${minutes} minuti e ${seconds} secondi.`);
+        }
+
+        function toggleFileList() {
+            showAllFiles = !showAllFiles;
+            updateFileList();
+        }
 
         function createZip() {
+            console.log('[START] createZip()');
+            const startTime = performance.now();
+
             if (selectedFiles.length === 0) {
                 alert("Seleziona almeno un file o una cartella.");
                 return;
@@ -86,6 +124,16 @@
                 document.getElementById('zipLoading').style.display = 'none';
                 // Mostra il pulsante invia con telegram
                 document.getElementById('sendBtn').style.display = 'inline-block';
+
+                const endTime = performance.now();
+                const durationMs = endTime - startTime;
+
+                // Conversione in minuti e secondi
+                const minutes = Math.floor(durationMs / 60000);
+                const seconds = ((durationMs % 60000) / 1000).toFixed(2);
+
+                console.log('[END] createZip()');
+                console.log(`Tempo impiegato: ${minutes} minuti e ${seconds} secondi.`);
             });
         }
 
