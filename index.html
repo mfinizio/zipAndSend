@@ -18,6 +18,12 @@
         <p>Seleziona i file da inviare al tuo medico</p>
         <p><em>I tuoi file non vengono salvati né trasmessi online. L'archivio ZIP viene creato direttamente sul tuo dispositivo.</em></p>
         
+        <hr>
+        <label for="telegramInput"><strong>Username Telegram a cui inviare i referti (TEMPORANEO, SERVE SOLO AI FINI DI TEST)</strong></label><br>
+        <input type="text" id="telegramInput" placeholder="@tuo_username" style="width: 100%; padding: 8px; margin-top: 5px;">
+        <p id="usernameOutput" style="color: green;"></p>
+        <hr>
+
         <input type="file" id="fileInput" multiple webkitdirectory style="display: none;">
         <button onclick="document.getElementById('fileInput').click()">Seleziona i file</button>
 
@@ -138,7 +144,9 @@
         }
 
         function sendToTelegram() {
-            const telegramUrl = 'https://web.telegram.org/k/#@gothicdegen';
+            const telegramUsernameInput = document.getElementById("telegramInput").value.trim();
+            const telegramUrl = `https://web.telegram.org/k/#${telegramUsernameInput}`;
+            console.log(telegramUrl);
             alert("Copia il file ZIP e invialo al tuo medico su Telegram.");
             window.open(telegramUrl, '_blank');
         }
