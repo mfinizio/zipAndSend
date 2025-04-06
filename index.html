@@ -16,10 +16,19 @@
     <div class="container">
         <h1>Invio Referti Medici</h1>
         <p>Seleziona i file da inviare al tuo medico</p>
-        <input type="file" id="fileInput" multiple>
-        <button onclick="createZip()">Crea Archivio ZIP</button>
+        <p><em>I tuoi file non vengono salvati né trasmessi online. L'archivio ZIP viene creato direttamente sul tuo dispositivo.</em></p>
+        <input type="file" id="fileInput" multiple style="display: none;">
+        <button onclick="document.getElementById('fileInput').click()">Seleziona i file</button>
 
         <div class="file-list" id="fileList"></div>
+
+        <button id="zipBtn" onclick="createZip()" style="display: none;">Crea Archivio ZIP</button>
+
+        <!-- Link per il download del file ZIP -->
+        <div id="downloadLinkContainer" style="display: none;">
+            <a id="downloadLink" href="" download="referti.zip">Scarica il file ZIP</a>
+        </div>
+
         <button id="sendBtn" style="display:none" onclick="sendToTelegram()">Invia su Telegram</button>
     </div>
 
@@ -36,6 +45,14 @@
                 fileItem.textContent = file.name;
                 fileListDiv.appendChild(fileItem);
             });
+
+            // Mostra il pulsante "Crea Archivio ZIP" solo se ci sono file selezionati
+            if (selectedFiles.length > 0) {
+                document.getElementById('zipBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('zipBtn').style.display = 'none';
+            }
+
         });
 
         function createZip() {
@@ -47,23 +64,36 @@
                 const zipFile = new Blob([content], { type: 'application/zip' });
                 const zipUrl = URL.createObjectURL(zipFile);
 
-                // Link per il download
-                const downloadLink = document.createElement('a');
-                downloadLink.href = zipUrl;
-                downloadLink.download = "referti.zip";
-                downloadLink.textContent = 'Scarica il file ZIP';
-
                 // Mostra il link per il download e il pulsante di invio
-                document.body.appendChild(downloadLink);
+                const downloadLink = document.getElementById('downloadLink');
+                downloadLink.href = zipUrl;
+                document.getElementById('downloadLinkContainer').style.display = 'block';
                 document.getElementById('sendBtn').style.display = 'inline-block';
             });
         }
 
         function sendToTelegram() {
-            const telegramUrl = 'https://t.me/<tuo_medico_username>';
-            alert("Copia il link del file ZIP e invialo al tuo medico su Telegram.");
+            const telegramUrl = 'https://t.me/@gothicdegen';
+            alert("Copia il file ZIP e invialo al tuo medico su Telegram.");
             window.open(telegramUrl, '_blank');
         }
     </script>
+
+    <style>
+        button, a {
+            display: inline-block;
+            padding: 10px 10px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+
+        #downloadLinkContainer {
+            margin-top: 10px;
+        }
+
+        #sendBtn {
+            margin-top: 10px;
+        }
+</style>
 </body>
 </html>
