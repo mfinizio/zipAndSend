@@ -41,16 +41,15 @@
             const fileListDiv = document.getElementById('fileList');
             fileListDiv.innerHTML = '';
             selectedFiles.forEach(file => {
+                // Mostra i file selezionati (inclusi quelli nelle cartelle)
                 const fileItem = document.createElement('p');
-                fileItem.textContent = file.name;
+                fileItem.textContent = file.webkitRelativePath || file.name;
                 fileListDiv.appendChild(fileItem);
             });
 
-            // Mostra il pulsante "Crea Archivio ZIP" solo se ci sono file selezionati
+            // Mostra il pulsante "Crea Archivio ZIP" solo se ci sono file
             if (selectedFiles.length > 0) {
-                document.getElementById('zipBtn').style.display = 'inline-block';
-            } else {
-                document.getElementById('zipBtn').style.display = 'none';
+                document.querySelector('button[onclick="createZip()"]').style.display = 'block';
             }
 
         });
